@@ -8,6 +8,7 @@ function App() {
       <div className="mt-10">
         <Noticias></Noticias>  
       </div>
+      <Footer></Footer>
     </div>
   );
 }
@@ -22,6 +23,20 @@ class Header extends React.Component{
       <header className="mt-12">
           <h1 class="text-center text-blue-600 font-sans text-3xl font-medium">As principais notícias sobre o Brasil com a <a target="_blank" className="hover:text-blue-800 visited:text-blue-900" href="https://newsapi.org/">News API</a></h1>
       </header>
+    )
+  }
+}
+
+class Footer extends React.Component{
+  constructor(props) {
+    super(props);
+  }
+
+  render(){
+    return (
+      <footer className="mt-12 border-t-2 border-gray-400 bg-gray-300 text-center w-full">
+          <span class="text-center text-blue-600 font-sans font-medium">Jonatan Hartmann, 2023, todos os direitos reservados. Disponível em meu <a target="_blank" className="hover:text-blue-800 visited:text-blue-900" href="https://github.com/hartmannjonatan/News-API">GitHub</a>.</span>
+      </footer>
     )
   }
 }
