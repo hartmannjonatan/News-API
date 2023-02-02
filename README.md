@@ -38,3 +38,9 @@ npm start
 
 O sistema está pronto para ser testado!
 
+## :mag_right: Em execução
+Screenshot do projeto sendo executado.
+
+![image](https://user-images.githubusercontent.com/89183359/216384336-7846267d-a7b0-4683-9a7e-bdfb584e9e53.png)
+
+
