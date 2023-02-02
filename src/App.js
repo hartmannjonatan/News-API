@@ -41,32 +41,6 @@ class Footer extends React.Component{
   }
 }
 
-class Paginacao extends React.Component{
-  constructor(props) {
-    super(props);
-  }
-
-  render(){
-    return (
-      <div class="flex flex-col items-center">
-        <span class="text-sm text-gray-700">
-            Mostrando <span class="font-semibold text-gray-900">1</span> a <span class="font-semibold text-gray-900">10</span> de <span class="font-semibold text-gray-900">{this.props.total}</span> notícias.
-        </span>
-        <div class="inline-flex mt-2 xs:mt-0">
-          <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 rounded-l hover:bg-blue-800">
-              <svg aria-hidden="true" class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
-              Anterior
-          </button>
-          <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-700 border-0 border-l border-blue-600 rounded-r hover:bg-blue-800">
-              Próximo
-              <svg aria-hidden="true" class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-          </button>
-        </div>
-      </div>
-    )
-  }
-}
-
 class Noticias extends React.Component{
   constructor(props) {
     super(props);
@@ -74,18 +48,37 @@ class Noticias extends React.Component{
       noticias: [],
       resultados: 0,
       isLoaded: false,
-      isError: null
+      isError: null,
+      perPage: 0,
+      currentPage: 0,
+      lastPage: true,
+      firstPage: true
     }
+    this.nextPage = this.nextPage.bind(this);
+    this.previousPage = this.previousPage.bind(this);
+  }
+
+  nextPage(){
+    this.setState(state=> ({
+      currentPage: state.currentPage + 1
+    }))
+  }
+
+  previousPage(){
+    this.setState(state=> ({
+      currentPage: state.currentPage - 1
+    }))
   }
 
   componentDidMount(){
-    fetch('https://newsapi.org/v2/top-headlines?country=br&apiKey=e6f66d10a1ac4f669f92e6e447fe58f9').then(res => res.json()).then(
+    fetch('https://newsapi.org/v2/top-headlines?country=br&pageSize=100&apiKey=e6f66d10a1ac4f669f92e6e447fe58f9').then(res => res.json()).then(
       (result) => {
         this.setState({
           noticias: result.articles,
           resultados: result.totalResults,
           isLoaded: true,
-          isError: false
+          isError: false,
+          perPage: 10
         })
       },
       (error) => {
@@ -153,22 +146,48 @@ class Noticias extends React.Component{
       );
     } else{
       if(!this.state.isError){
-          this.state.noticias.forEach(noticia => {
+          let noticias = this.state.noticias;
+
+          let first = this.state.currentPage*this.state.perPage + 1;
+          let last = first+this.state.perPage - 1 < this.state.resultados ? first+this.state.perPage - 1 : this.state.resultados;
+
+          jsx = (
+            <div class="flex flex-col items-center">
+              <span class="text-sm text-gray-700">
+                  Mostrando <span class="font-semibold text-gray-900">{first}</span> a <span class="font-semibold text-gray-900">{last}</span> de <span class="font-semibold text-gray-900">{this.state.resultados}</span> notícias.
+              </span>
+              <div class="inline-flex mt-2 xs:mt-0">
+                <button onClick={this.previousPage} disabled={first == 1 ? true : false} class="inline-flex items-center px-4 py-2 text-sm font-medium text-white disabled:text-gray-400 bg-blue-700 disabled:bg-blue-300 rounded-l enabled:hover:bg-blue-800">
+                    <svg aria-hidden="true" class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path></svg>
+                    Anterior
+                </button>
+                <button onClick={this.nextPage} disabled={last == this.state.resultados ? true : false} class="inline-flex items-center px-4 py-2 text-sm font-medium text-white disabled:text-gray-400 disabled:bg-blue-300 bg-blue-700 border-0 border-l border-blue-600 rounded-r hover:bg-blue-800">
+                    Próximo
+                    <svg aria-hidden="true" class="w-5 h-5 ml-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+              </div>
+            </div>
+          )
+          
+          for(let i = this.state.currentPage*this.state.perPage; i < this.state.perPage*this.state.currentPage+10; i++){
+            if(i < this.state.resultados){
               let aux = (
-                <a target="_blank" href={noticia.url}>
+                <a target="_blank" href={noticias[i].url}>
                   <div class="mt-3 p-6 max-w-5xl mx-auto bg-white hover:bg-white/0 transition-all ease-in-out delay-150 hover:border-2 hover:border-blue-700/80 rounded-xl shadow-lg flex items-center space-x-4">
                     <div class="shrink-0">
-                      <img class="h-40" src={noticia.urlToImage != null ? noticia.urlToImage : "indisponivel.png"} alt="Imagem não encontrada."></img>
+                      <img class="h-40" src={noticias[i].urlToImage != null ? noticias[i].urlToImage : "indisponivel.png"} alt="Imagem não encontrada."></img>
                     </div>
                     <div>
-                      <h2 class="text-2xl font-medium text-black">{noticia.title} | {noticia.author != null ? noticia.author : "Autor indisponível"}</h2>
-                      <p class="mt-3 text-slate-500 text-justify">{noticia.description}</p>
+                      <h2 class="text-2xl font-medium text-black">{noticias[i].title} | {noticias[i].author != null ? noticias[i].author : "Autor indisponível"}</h2>
+                      <p class="mt-3 text-slate-500 text-justify">{noticias[i].description}</p>
                     </div>
                   </div>
                 </a>
               )
               jsx = [jsx, aux];
-          });
+            }
+          }
+
       } else{
         jsx = (
           <div class="mt-3 p-6 max-w-5xl mx-auto bg-red-50 rounded-xl shadow-lg flex items-center space-x-4">
